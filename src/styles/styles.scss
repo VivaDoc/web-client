@@ -1,0 +1,198 @@
+/** Global SCSS */
+
+/** Color Scheme */
+
+$vd-base-dark: #0B0C10;
+$vd-base-medium: #1F2833;
+$vd-base-light: #C5C6C7;
+$vd-spark-bright: #66FCF1;
+$vd-spark-dark: #45A29E;
+
+
+.has-code-editor {
+    overflow: auto;
+    height: 500px;
+
+    pre {
+      min-height: 100%;
+      border: 1px solid lightgrey;
+
+      .green-line {
+        background: #002800;
+        border-color: #060;
+        position: absolute;
+      }
+
+      .red-line {
+        background: #380000;
+        border-color: #600;
+        position: absolute;
+      }
+
+    }
+}
+
+.vd-toggle-buttons {
+
+  button {
+    color: $vd-base-dark;
+    border-color: lightgrey;
+    color: #4A4A4A;
+
+    &.is-active, &:hover {
+      border-color: #dbdbdb;
+      background-color: #F4F4F4;
+    }
+
+  }
+}
+
+.is-vd-hero-title {
+    // font-size: 110px !important;
+    color: $vd-spark-bright !important;
+}
+
+.is-vd-box-link {
+    border-radius: 2px !important;
+    background-color: inherit !important;
+    border: 0.5px $vd-spark-dark solid !important;
+    color: $vd-spark-dark !important;
+}
+
+.has-text-vd-base-light {
+    color: $vd-base-light !important;
+}
+
+.has-text-vd-base-medium {
+    color: $vd-base-medium;
+}
+
+.has-text-vd-base-dark {
+  color: $vd-base-dark;
+}
+
+.has-text-vd-spark-bright {
+    color: $vd-spark-bright !important;
+}
+
+.has-text-vd-spark-dark {
+    color: $vd-spark-dark !important;
+}
+
+.vd-regular-text {
+  color: hsl(0, 0%, 29%) !important;
+}
+
+.single-line-ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.styled-hr {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.05));
+}
+
+.sub-editor-action-word {
+  margin-top: 3px;
+  color: $vd-spark-dark;
+  cursor: pointer;
+}
+
+.play-vid-svg {
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+iframe {
+  &.vd-landing-vid {
+    width:  100% !important;
+    height: 100% !important;
+  }
+}
+
+/** Bulma CSS and internal CSS requiring Bulma to be loaded. */
+
+// Bulma variables
+$primary: $vd-base-medium;
+$link: $vd-spark-dark;
+$family-primary: 'Roboto', sans-serif;
+$box-radius: 2px;
+$modal-card-head-radius: 2px;
+$modal-card-foot-radius: 2px;
+$tabs-toggle-link-active-background-color: #F4F4F4;
+$tabs-toggle-link-active-border-color: #dbdbdb;
+$tabs-toggle-link-active-color: #666;
+
+@import "~bulma/sass/utilities/_all.sass";
+@import "~bulma/sass/base/_all.sass";
+
+@import "~bulma/sass/components/level.sass";
+@import "~bulma/sass/components/modal.sass";
+@import "~bulma/sass/components/navbar.sass";
+@import "~bulma/sass/components/menu.sass";
+@import "~bulma/sass/components/tabs.sass";
+
+@import "~bulma/sass/elements/box.sass";
+@import "~bulma/sass/elements/button.sass";
+@import "~bulma/sass/elements/container.sass";
+@import "~bulma/sass/elements/content.sass";
+@import "~bulma/sass/elements/icon.sass";
+@import "~bulma/sass/elements/table.sass";
+@import "~bulma/sass/elements/title.sass";
+@import "~bulma/sass/elements/progress.sass";
+
+@import "~bulma/sass/grid/columns.sass";
+@import "~bulma/sass/grid/tiles.sass";
+
+@import "~bulma/sass/layout/section.sass";
+@import "~bulma/sass/layout/hero.sass";
+
+.loader {
+  @extend %loader;
+  height: 50px;
+  width: 50px;
+}
+
+.is-border-bottom-underlined {
+  border-bottom: 3px solid $vd-spark-dark;
+
+  @media only screen and (max-width: $desktop) {
+    border-bottom: none;
+    background-color: whitesmoke;
+  }
+}
+
+.modal-card {
+  border-radius: 2px;
+}
+
+.has-negative-top-margin-on-mobile {
+
+  @media screen and (max-width: $tablet) {
+    margin-top: -10px;
+  }
+}
+
+.buttons-above-editor-mobile {
+
+  button {
+    border-radius: 2px;
+    margin-bottom: 0px;
+
+    &.right-button {
+      margin-right: 0px !important;
+    }
+  }
+
+  margin-bottom: 0px !important;
+
+  @media screen and (min-width: $tablet) {
+    display: none !important;
+  }
+}
