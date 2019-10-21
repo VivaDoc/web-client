@@ -93,29 +93,37 @@ renderNavbar config maybeViewer =
                     , Route.href Route.Home
                     ]
                     [ text "Home" ]
-                ]
-            , div
-                [ class "navbar-end" ]
-                [ a
+                , a
                     [ class "navbar-item"
                     , Route.href <| Route.Documentation Route.OverviewTab
                     ]
                     [ text "Documentation" ]
-                , div [ class "navbar-item" ]
-                    (case maybeViewer of
+                ]
+            , div
+                [ class "navbar-end" ]
+                [ div
+                    [ class "navbar-item" ]
+                    [ case maybeViewer of
                         Nothing ->
-                            [ button
-                                [ classList
-                                    [ ( "button is-info is-outlined is-medium", True )
-                                    , ( "is-loading", config.isLoggingIn )
+                            div
+                                [ class "buttons" ]
+                                [ a
+                                    [ class "button is-dark"
+                                    , href "https://github.com/vivadoc"
                                     ]
-                                , onClick config.loginWithGithub
+                                    [ text "View code on GitHub" ]
+                                , button
+                                    [ classList
+                                        [ ( "button is-info", True )
+                                        , ( "is-loading", config.isLoggingIn )
+                                        ]
+                                    , onClick config.loginWithGithub
+                                    ]
+                                    [ text "Sign in with GitHub" ]
                                 ]
-                                [ text "Sign in with GitHub" ]
-                            ]
 
                         Just viewer ->
-                            [ button
+                            button
                                 [ classList
                                     [ ( "button is-light is-medium", True )
                                     , ( "is-loading", config.isLoggingOut )
@@ -123,8 +131,7 @@ renderNavbar config maybeViewer =
                                 , onClick config.logout
                                 ]
                                 [ text "Log out" ]
-                            ]
-                    )
+                    ]
                 ]
             ]
         ]

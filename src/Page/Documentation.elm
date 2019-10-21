@@ -24,30 +24,11 @@ init : Session.Session -> Route.DocumentationTab -> ( Model, Cmd Msg )
 init session documentationTab =
     ( { documentationTab = documentationTab, session = session }
     , case documentationTab of
-        Route.CodeExample ->
-            Ports.renderCodeEditors
-                [ example1a.renderConfig
-                , example1b.renderConfig
-                , example1c.renderConfig
-                , example1d.renderConfig
-                , example1e.renderConfig
-                , example1f.renderConfig
-                ]
-
         Route.TagsTab ->
             Ports.renderCodeEditors
                 [ docTagsCodeEditor1.renderConfig
                 , docTagsCodeEditor2.renderConfig
                 ]
-
-        Route.FileTagTab ->
-            Ports.renderCodeEditors [ fileTagEditor1.renderConfig ]
-
-        Route.LineTagTab ->
-            Ports.renderCodeEditors [ lineTagEditor1.renderConfig ]
-
-        Route.BlockTagTab ->
-            Ports.renderCodeEditors [ blockTagEditor1.renderConfig ]
 
         _ ->
             Cmd.none
@@ -61,12 +42,6 @@ view model =
             Route.InstallationTab ->
                 "Installation"
 
-            Route.GettingStartedTab ->
-                "Getting Started"
-
-            Route.CodeExample ->
-                "Code Example"
-
             Route.SupportedLanguagesTab ->
                 "Supported Languages"
 
@@ -75,15 +50,6 @@ view model =
 
             Route.TagsTab ->
                 "Tags"
-
-            Route.FileTagTab ->
-                "File Tags"
-
-            Route.LineTagTab ->
-                "Line Tags"
-
-            Route.BlockTagTab ->
-                "Block Tags"
 
             Route.OwnershipGroupsTab ->
                 "Ownership Groups"
@@ -94,7 +60,7 @@ view model =
 renderDocumentation : Model -> Html msg
 renderDocumentation ({ session, documentationTab } as model) =
     div
-        [ class "columns" ]
+        [ class "columns color-bg-grey" ]
         [ div
             [ class "column is-one-quarter-desktop is-one-third-tablet" ]
             [ renderSidebar documentationTab ]
@@ -137,9 +103,6 @@ renderSidebar docTab =
                 [ class "menu-list" ]
                 [ sidebarLink "overview" Route.OverviewTab Nothing
                 , sidebarLink "installation" Route.InstallationTab Nothing
-                , sidebarLink "getting started" Route.GettingStartedTab <|
-                    Just
-                        [ sidebarLink "code example" Route.CodeExample Nothing ]
                 , sidebarLink "supported languages" Route.SupportedLanguagesTab Nothing
                 ]
             , p
@@ -147,12 +110,7 @@ renderSidebar docTab =
                 [ text "API Reference" ]
             , ul
                 [ class "menu-list" ]
-                [ sidebarLink "documentation tags" Route.TagsTab <|
-                    Just
-                        [ sidebarLink "file tag" Route.FileTagTab Nothing
-                        , sidebarLink "line tag" Route.LineTagTab Nothing
-                        , sidebarLink "block tag" Route.BlockTagTab Nothing
-                        ]
+                [ sidebarLink "documentation tags" Route.TagsTab Nothing
                 , sidebarLink "ownership groups" Route.OwnershipGroupsTab Nothing
                 ]
             ]
@@ -169,12 +127,6 @@ renderDocTabContent { session, documentationTab } =
         Route.InstallationTab ->
             renderInstallationTabView maybeViewer
 
-        Route.GettingStartedTab ->
-            renderGettingStartedTabView
-
-        Route.CodeExample ->
-            renderCodeExampleTabView
-
         Route.SupportedLanguagesTab ->
             renderSupportedLanguagesTabView
 
@@ -183,15 +135,6 @@ renderDocTabContent { session, documentationTab } =
 
         Route.TagsTab ->
             renderTagsTabView
-
-        Route.FileTagTab ->
-            renderFileTagTabView
-
-        Route.LineTagTab ->
-            renderLineTagTabView
-
-        Route.BlockTagTab ->
-            renderBlockTagTabView
 
         Route.OwnershipGroupsTab ->
             renderOwnershipGroupsTabView
@@ -341,76 +284,33 @@ renderInstallationTabView maybeViewer =
 
 renderOverviewTabView : Html msg
 renderOverviewTabView =
-    div
-        [ class "content" ]
-        [ h1
-            [ class "title is-2 has-text-vd-base-dark has-text-weight-light" ]
-            [ text "Overview" ]
-        , span
-            [ class "vd-regular-text" ]
-            [ text """Conceptually, VivaDoc is built on the """
-            , span [ class "has-text-weight-bold" ] [ text """Directly Responsible Individual""" ]
-            , text """ principle created and
-              currently used at Apple. The principle is rather intuitive, projects will be more successful if each
-              component always has someone directly responsible. This model helps keep team members proactive and never
-              assuming"""
-            , span [ class "has-text-weight-semibold" ] [ text " someone else will handle it." ]
-            ]
-        , p
-            [ class "vd-regular-text", style "margin-top" "30px" ]
-            [ text """It has become so common-place in the industry for technical documentation to become outdated
-              that it comes as no surprise to developers when half their day is spent mangling a piece of code only to
-              find out the documentation for the library they were using was entirely outdated."""
-            ]
-        , p
-            [ class "vd-regular-text", style "margin-top" "30px" ]
-            [ text """Enter VivaDoc to establish the new status quo. With VivaDoc, members of your team become directly
-              responsible for the documentation of components they manage. Whether it is external documentation for a
-              public API or internal
-              documentation for a critical library, VivaDoc will make sure that nothing slips by unnoticed.
-              Best of all, VivaDoc works entirely out of the box and can be installed in just a few clicks. It can be
-              gradually added to any large project so there is no barrier-to-entry. In just a"""
-            , span [ class "has-text-weight-semibold" ] [ text " few minutes " ]
-            , text """you can assign
-              responsibility to the most critical documentation and save your team and your customers countless hours
-              of frustration."""
-            ]
-        , p
-            [ class "vd-regular-text", style "margin-top" "30px" ]
-            [ text """It is time for all of us as a community to value each other's time and start shipping
-              high-quality documentation."""
-            ]
-        ]
-
-
-renderGettingStartedTabView : Html msg
-renderGettingStartedTabView =
     div [ class "content" ] <|
         [ h1
             [ class "title is-2 has-text-vd-base-dark has-text-weight-light" ]
-            [ text "Getting Started" ]
+            [ text "Overview" ]
         , p
             [ class "vd-regular-text" ]
-            [ text "Once you have installed VivaDoc in a repository, it automatically monitors all"
-            , span [ class "has-text-weight-semibold" ] [ text " documentation tags " ]
-            , text """ on every open pull request. Everytime a pull request changes, VivaDoc analyzes
-            the most recent commit on that pull request."""
+            [ text """VivaDoc is to code comments what CI is to testing. Instead of monitoring tests passing, it's
+            monitoring """
+            , a [ Route.href <| Route.Documentation Route.TagsTab ] [ text " documentation tags " ]
+            , text """ being approved. Instead of preventing bugs from getting into production, you're
+            preventing bad code comments from getting into your codebase."""
             ]
         , p
             []
-            [ text """If any documentation tags have been modified but have not been approved by their owners, VivaDoc
-            assigns a failure status to that commit. To review documentation tags, click the VivaDoc status link
-            displayed on the GitHub pull request. It will direct you to the documentation review page within the VivaDoc
-            app. There you will be able to review all documentation tags that require your approval. Once all
-            documentation tags have been reviewed and approved, VivaDoc will assign a success status to that commit."""
+            [ text "When"
+            , a [ Route.href <| Route.Documentation Route.TagsTab ] [ text " documentation tags " ]
+            , text """ have been modified but have not been approved by their owners, VivaDoc
+              assigns a failure status to that commit. Exactly like a CI service, VivaDoc will attach a link on the
+              failed commit status, click this to view which tags require approval. Once everything has been reviewed
+              and approved, VivaDoc will assign a success status to that commit."""
             ]
         , p
             []
-            [ text """It is up to the owners of the repository to decide whether a pull request can be merged if the
-            documentation has a failing status. While it is optional,
-            it is highly recommended to require a VivaDoc success status to merge a pull request with a production
-            branch - fixing broken documentation is not nearly as time consuming or frustrating as stumbling into broken
-            documentation unknowingly."""
+            [ text """Lastly, exactly like a CI service, it is up to the owners of the repository to decide whether a
+            pull request can be merged if the documentation has a failing status. VivaDoc defaults to not forcing
+            passing documentation because it does not want to get in your way. This way you can easily try VivaDoc
+            without worrying about your PRs being blocked due to unverified documentation."""
             ]
         ]
 
@@ -433,188 +333,6 @@ renderCodeEditorColumns { renderConfig, textAboveEditor, editorSubText, editorHe
             [ CodeEditor.codeEditor renderConfig.tagId ]
         , div [ class "has-text-grey-light", style "margin-bottom" "40px" ] [ text editorSubText ]
         ]
-
-
-renderCodeExampleTabView : Html msg
-renderCodeExampleTabView =
-    div [ class "content" ] <|
-        [ h1
-            [ class "title is-2 has-text-vd-base-dark has-text-weight-light" ]
-            [ text "Code Example" ]
-        , renderCodeEditorColumns example1a
-        , renderCodeEditorColumns example1b
-        , renderCodeEditorColumns example1c
-        , renderCodeEditorColumns example1d
-        , renderCodeEditorColumns example1e
-        , renderCodeEditorColumns example1f
-        , p
-            []
-            [ text "This was a fictional example to showcase how simple it is to use VivaDoc." ]
-        ]
-
-
-example1a : RenderCodeEditorColumnsConfig
-example1a =
-    { renderConfig =
-        { tagId = "example-1a"
-        , startLineNumber = 200
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = []
-        , content =
-            [ "// Place a booking for a given time slot."
-            , "// NOTE: Double-booking is permitted."
-            , "const bookTimeslot = (locationId: String, timeslot: Timeslot) => { "
-            , " ..."
-            , "}"
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = "Let us take a look at a single function in an imaginary public booking service API."
-    , editorSubText = "The code for the function is omitted."
-    , editorHeight = 100
-    }
-
-
-example1b : RenderCodeEditorColumnsConfig
-example1b =
-    { renderConfig =
-        { tagId = "example-1b"
-        , startLineNumber = 200
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = [ ( 202, 202 ), ( 206, 206 ) ]
-        , content =
-            [ "// Place a booking for a given time slot."
-            , "// NOTE: Double-booking is permitted."
-            , "// @VD amilner42 block"
-            , "const bookTimeslot = (locationId: String, timeslot: Timeslot) => { "
-            , " ..."
-            , "}"
-            , "// @VD end-block"
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = """If I wanted to assign myself, amilner42, to be directly responsible for this documentation
-    all I have to do is add a documentation tag.
-    In this case I used a block tag to capture the block of code representing the function. Block tags will likely be
-    the most common type of documentation tag that you use as they can wrap any chunk of code."""
-    , editorSubText = "Diff highlighted in green."
-    , editorHeight = 130
-    }
-
-
-example1c : RenderCodeEditorColumnsConfig
-example1c =
-    { renderConfig =
-        { tagId = "example-1c"
-        , startLineNumber = 200
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = [ ( 202, 202 ), ( 206, 206 ) ]
-        , content =
-            [ "// Place a booking for a given time slot."
-            , "// NOTE: Double-booking is permitted."
-            , "// @VD amilner42,bderayat block"
-            , "const bookTimeslot = (locationId: String, timeslot: Timeslot) => { "
-            , " ..."
-            , "}"
-            , "// @VD end-block"
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = """It may be the case though that you don't want to be the only one directly responsible. If
-    you would like to require approval from multiple users you simply list all users separated by commas. In the
-    following case, the tag will require approval from both amilner42 and bderayat."""
-    , editorSubText = "Diff highlighted in green."
-    , editorHeight = 130
-    }
-
-
-example1d : RenderCodeEditorColumnsConfig
-example1d =
-    { renderConfig =
-        { tagId = "example-1d"
-        , startLineNumber = 200
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = [ ( 202, 202 ), ( 206, 206 ) ]
-        , content =
-            [ "// Place a booking for a given time slot."
-            , "// NOTE: Double-booking is permitted."
-            , "// @VD amilner42|bderayat block"
-            , "const bookTimeslot = (locationId: String, timeslot: Timeslot) => { "
-            , " ..."
-            , "}"
-            , "// @VD end-block"
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = """Had I instead wanted to require approval from either of us, I simply would
-    use the following syntax. You can use as many commas and pipes as you need."""
-    , editorSubText = "Diff highlighted in green."
-    , editorHeight = 130
-    }
-
-
-example1e : RenderCodeEditorColumnsConfig
-example1e =
-    { renderConfig =
-        { tagId = "example-1e"
-        , startLineNumber = 200
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = [ ( 204, 206 ) ]
-        , content =
-            [ "// Place a booking for a given time slot."
-            , "// NOTE: Double-booking is permitted."
-            , "// @VD amilner42 block"
-            , "const bookTimeslot = (locationId: String, timeslot: Timeslot) => { "
-            , "  if (isDoubleBooked(locationId, timeslot)) {"
-            , "    throw new BookingError(...);"
-            , "  }"
-            , "  ..."
-            , "}"
-            , "// @VD end-block"
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = """Let us now imagine someone changes the code but does not update the documentation to reflect
-    this new change."""
-    , editorSubText = "Diff highlighted in green."
-    , editorHeight = 175
-    }
-
-
-example1f : RenderCodeEditorColumnsConfig
-example1f =
-    { renderConfig =
-        { tagId = "example-1f"
-        , startLineNumber = 200
-        , customLineNumbers = Just [ Just 200, Nothing, Just 201, Just 202, Just 203, Just 204, Just 205, Just 206, Just 207, Just 208 ]
-        , redLineRanges = [ ( 201, 201 ) ]
-        , greenLineRanges = []
-        , content =
-            [ "// Place a booking for a given time slot."
-            , "// NOTE: Double-booking is permitted."
-            , "// @VD amilner42 block"
-            , "const bookTimeslot = (locationId: String, timeslot: Timeslot) => { "
-            , "  if (isDoubleBooked(locationId, timeslot)) {"
-            , "    throw new BookingError(...);"
-            , "  }"
-            , "  ..."
-            , "}"
-            , "// @VD end-block"
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = """Luckily VivaDoc would require my review, and upon VivaDoc showing me the diff and the docs
-    it would be rather obvious that the documentation has not been updated properly. I can commit a simple fix preventing
-    these docs from frustrating the users consuming our API.
-    """
-    , editorSubText = "Diff highlighted in red."
-    , editorHeight = 175
-    }
 
 
 renderSupportedLanguagesTabView : Html msg
@@ -667,43 +385,9 @@ renderTagsTabView =
             [ text "Ownership Groups" ]
         , p
             [ style "margin-bottom" "40px" ]
-            [ text "VivaDoc permits a single owner for the documentation, such as "
-            , span [ class "has-text-weight-semibold" ] [ text "amilner42" ]
-            , text """. In addition, it allows ownership groups that allow for more fine-grained control to suit the
-            specific needs of your team. You can read about the syntax for ownership groups """
-            , a [ Route.href <| Route.Documentation Route.OwnershipGroupsTab ] [ text "here" ]
+            [ text "If your team requires more than a single owner for critical documentation tags, simply use "
+            , a [ Route.href <| Route.Documentation Route.OwnershipGroupsTab ] [ text "ownership groups" ]
             , text "."
-            ]
-        , h1
-            [ class "title is-5 has-text-vd-base-dark has-text-weight-bold" ]
-            [ text "Tag Types" ]
-        , p
-            []
-            [ text "The tag type must be one of "
-            , span [ class "has-text-weight-semibold" ] [ text "file" ]
-            , text ", "
-            , span [ class "has-text-weight-semibold" ] [ text "line" ]
-            , text ", or "
-            , span [ class "has-text-weight-semibold" ] [ text "block" ]
-            , text "."
-            ]
-        , dl
-            [ style "margin" "10px 0 0 20px" ]
-            [ dt
-                []
-                [ a [ Route.href <| Route.Documentation Route.FileTagTab ] [ text "File Tag" ]
-                , dd [] [ text "Associate some documentation to an entire file." ]
-                ]
-            , dt
-                []
-                [ a [ Route.href <| Route.Documentation Route.LineTagTab ] [ text "Line Tag" ]
-                , dd [] [ text "Associate some documentation to the following line." ]
-                ]
-            , dt
-                []
-                [ a [ Route.href <| Route.Documentation Route.BlockTagTab ] [ text "Block Tag" ]
-                , dd [] [ text "Associate some documentation to a specified block of code." ]
-                ]
             ]
         ]
 
@@ -719,15 +403,15 @@ docTagsCodeEditor1 =
         , content =
             [ "/* some docs"
             , " * more docs"
-            , " *"
-            , " * @VD <ownership-groups> <tag-type>"
+            , " * @VD <ownership-groups> start"
             , " */"
             , "... code ..."
+            , "// @VD end"
             ]
         , language = Language.toString Language.JavaScript
         }
     , textAboveEditor = "VivaDoc documentation tags always use the following syntax."
-    , editorSubText = "multi-line comment"
+    , editorSubText = "multiline comment"
     , editorHeight = 110
     }
 
@@ -743,136 +427,16 @@ docTagsCodeEditor2 =
         , content =
             [ "// some docs"
             , "// more docs"
-            , "// @VD <ownership-groups> <tag-type>"
+            , "// @VD <ownership-groups> start"
             , "... code ..."
+            , "// @VD end"
             ]
         , language = Language.toString Language.JavaScript
         }
     , textAboveEditor = """VivaDoc will detect and group multiple single line comments that start at the same
     indentation level into a single doc - use whatever you prefer."""
-    , editorSubText = "grouped single-line comments"
-    , editorHeight = 80
-    }
-
-
-renderFileTagTabView : Html msg
-renderFileTagTabView =
-    div [ class "content" ] <|
-        [ h1
-            [ class "title is-2 has-text-vd-base-dark has-text-weight-light" ]
-            [ text "File Tag" ]
-        , renderCodeEditorColumns fileTagEditor1
-        , p
-            []
-            [ text """You should not use the file tag for monitoring specific chunks of code, the block tag is more
-            effective for that situation. The file tag is effective when you have some documentation for the entire
-            package or module at the top of the file and you want to make sure it stays relevant as people upgrade the
-            package or module.""" ]
-        ]
-
-
-fileTagEditor1 : RenderCodeEditorColumnsConfig
-fileTagEditor1 =
-    { renderConfig =
-        { tagId = "file-tag-1"
-        , startLineNumber = 1
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = []
-        , content =
-            [ "// module docs"
-            , "// module docs"
-            , "// @VD amilner42 file"
-            , ""
-            , "... code ..."
-            , ""
-            , "... code ..."
-            , ""
-            , "... code ..."
-            ]
-        , language = Language.toString Language.JavaScript
-        }
-    , textAboveEditor = """A file tag will associate the documentation with everything in the entire file.
-    Any changes made to any parts of the file will require approval."""
-    , editorSubText = "A file tag"
-    , editorHeight = 160
-    }
-
-
-renderLineTagTabView : Html msg
-renderLineTagTabView =
-    div [ class "content" ] <|
-        [ h1
-            [ class "title is-2 has-text-vd-base-dark has-text-weight-light" ]
-            [ text "Line Tag" ]
-        , renderCodeEditorColumns lineTagEditor1
-        ]
-
-
-lineTagEditor1 : RenderCodeEditorColumnsConfig
-lineTagEditor1 =
-    { renderConfig =
-        { tagId = "line-tag-1"
-        , startLineNumber = 100
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = []
-        , content =
-            [ "... code ..."
-            , ""
-            , "// some docs"
-            , "// @VD amilner42 line"
-            , "export const WEBPACK_INIT_KEY_VAL = ..."
-            , ""
-            , "... code ..."
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = """A line tag will associate the documentation with the following line. Any changes
-    made to the documentation or the following line will require approval."""
-    , editorSubText = "A line tag"
-    , editorHeight = 130
-    }
-
-
-renderBlockTagTabView : Html msg
-renderBlockTagTabView =
-    div [ class "content" ] <|
-        [ h1
-            [ class "title is-2 has-text-vd-base-dark has-text-weight-light" ]
-            [ text "Block Tag" ]
-        , renderCodeEditorColumns blockTagEditor1
-        , p
-            []
-            [ text "The block tag should be the standard way you use VivaDoc to monitor documentation." ]
-        ]
-
-
-blockTagEditor1 : RenderCodeEditorColumnsConfig
-blockTagEditor1 =
-    { renderConfig =
-        { tagId = "block-tag-1"
-        , startLineNumber = 100
-        , customLineNumbers = Nothing
-        , redLineRanges = []
-        , greenLineRanges = []
-        , content =
-            [ "... code ..."
-            , ""
-            , "// some docs"
-            , "// @VD amilner42 block"
-            , "...code..."
-            , "...code..."
-            , "...code..."
-            , "// @VD end-block"
-            ]
-        , language = Language.toString Language.TypeScript
-        }
-    , textAboveEditor = """A block tag will associate the documentation with a block of code. Any changes
-    made to the documentation or the block of code will require approval. Unlike the other tags, block tags require
-    an end-block VivaDoc annotation in order to specify the end of the block."""
-    , editorSubText = "A block tag"
-    , editorHeight = 140
+    , editorSubText = "single-line comments"
+    , editorHeight = 90
     }
 
 
