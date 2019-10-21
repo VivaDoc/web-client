@@ -7,7 +7,7 @@ $vd-base-medium: #1F2833;
 $vd-base-light: #C5C6C7;
 $vd-spark-bright: #66FCF1;
 $vd-spark-dark: #45A29E;
-
+$bg-grey: #FAFCFD;
 
 .has-code-editor {
     overflow: auto;
@@ -116,11 +116,18 @@ iframe {
   }
 }
 
+html, body {
+  background-color: $bg-grey;
+  height: 100%;
+}
+
+.color-bg-grey {
+  background-color: $bg-grey;
+}
+
 /** Bulma CSS and internal CSS requiring Bulma to be loaded. */
 
 // Bulma variables
-$primary: $vd-base-medium;
-$link: $vd-spark-dark;
 $family-primary: 'Roboto', sans-serif;
 $box-radius: 2px;
 $modal-card-head-radius: 2px;
@@ -160,7 +167,7 @@ $tabs-toggle-link-active-color: #666;
 }
 
 .is-border-bottom-underlined {
-  border-bottom: 3px solid $vd-spark-dark;
+  border-bottom: 3px solid blue;
 
   @media only screen and (max-width: $desktop) {
     border-bottom: none;

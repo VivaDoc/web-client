@@ -17,13 +17,11 @@ import Http exposing (Error(..))
 import Json.Decode as Decode
 import LocalStorage
 import Page
-import Page.AboutUs as AboutUs
 import Page.CommitReview as CommitReview
 import Page.Documentation as Documentation
 import Page.Home as Home
 import Page.NotFound as NotFound
 import Page.OAuthRedirect as OAuthRedirect
-import Page.Pricing as Pricing
 import Page.Redirect as Redirect
 import Page.Repo as Repo
 import Ports
@@ -56,8 +54,6 @@ type PageModel
     | CommitReview CommitReview.Model
     | Documentation Documentation.Model
     | Repo Repo.Model
-    | AboutUs AboutUs.Model
-    | Pricing Pricing.Model
 
 
 {-| On init we have 2 cases:
@@ -115,21 +111,17 @@ view model =
         viewer =
             Session.getViewer (toSession model)
 
-        viewPageWithNavbar { showHomeButton, showHero, selectedTab } toMsg pageView =
+        viewPageWithNavbar { showHomeButton, selectedTab } toMsg pageView =
             let
                 { title, body } =
                     Page.viewWithHeader
-                        { showHero = showHero
-                        , renderNavbarConfig =
-                            { mobileNavbarOpen = model.mobileNavbarOpen
-                            , toggleMobileNavbar = ToggledMobileNavbar
-                            , logout = Logout
-                            , loginWithGithub = OnClickLoginWithGithub
-                            , isLoggingIn = model.isLoggingIn
-                            , isLoggingOut = model.isLoggingOut
-                            , showHomeButton = showHomeButton
-                            , selectedTab = selectedTab
-                            }
+                        { mobileNavbarOpen = model.mobileNavbarOpen
+                        , toggleMobileNavbar = ToggledMobileNavbar
+                        , logout = Logout
+                        , loginWithGithub = OnClickLoginWithGithub
+                        , isLoggingIn = model.isLoggingIn
+                        , isLoggingOut = model.isLoggingOut
+                        , selectedTab = selectedTab
                         }
                         viewer
                         pageView
@@ -142,13 +134,13 @@ view model =
     case model.pageModel of
         Redirect _ redirectReason ->
             viewPageWithNavbar
-                { showHomeButton = False, showHero = Page.NoHero, selectedTab = Page.NoTab }
+                { showHomeButton = False, selectedTab = Page.NoTab }
                 (\_ -> Ignored)
                 (Redirect.view redirectReason)
 
         NotFound _ ->
             viewPageWithNavbar
-                { showHomeButton = True, showHero = Page.NoHero, selectedTab = Page.NoTab }
+                { showHomeButton = True, selectedTab = Page.NoTab }
                 (\_ -> Ignored)
                 NotFound.view
 
@@ -157,56 +149,38 @@ view model =
                 (case viewer of
                     Nothing ->
                         { showHomeButton = False
-                        , showHero =
-                            Page.LandingHero
-                                { scrollMsg = LandingPageScrollDown
-                                , videoModalOpen = model.videoModalOpen
-                                , setVideoModalOpenValue = ToggleVideoOpenModal
-                                }
                         , selectedTab = Page.NoTab
                         }
 
                     Just _ ->
-                        { showHomeButton = True, showHero = Page.NoHero, selectedTab = Page.HomeTab }
+                        { showHomeButton = True, selectedTab = Page.HomeTab }
                 )
                 GotHomeMsg
                 (Home.view homeModel)
 
         OAuthRedirect oauthRedirect ->
             viewPageWithNavbar
-                { showHomeButton = False, showHero = Page.NoHero, selectedTab = Page.NoTab }
+                { showHomeButton = False, selectedTab = Page.NoTab }
                 GotOAuthRedirectMsg
                 (OAuthRedirect.view oauthRedirect)
 
         CommitReview commitReviewModel ->
             viewPageWithNavbar
-                { showHomeButton = True, showHero = Page.NoHero, selectedTab = Page.NoTab }
+                { showHomeButton = True, selectedTab = Page.NoTab }
                 GotCommitReviewMsg
                 (CommitReview.view commitReviewModel)
 
         Documentation documentationModel ->
             viewPageWithNavbar
-                { showHomeButton = True, showHero = Page.NoHero, selectedTab = Page.DocumentationTab }
+                { showHomeButton = True, selectedTab = Page.DocumentationTab }
                 GotDocumentationMsg
                 (Documentation.view documentationModel)
 
         Repo repoModel ->
             viewPageWithNavbar
-                { showHomeButton = True, showHero = Page.NoHero, selectedTab = Page.NoTab }
+                { showHomeButton = True, selectedTab = Page.NoTab }
                 GotRepoMsg
                 (Repo.view repoModel)
-
-        AboutUs aboutUsModel ->
-            viewPageWithNavbar
-                { showHomeButton = True, showHero = Page.NoHero, selectedTab = Page.AboutUsTab }
-                GotAboutUsMsg
-                (AboutUs.view aboutUsModel)
-
-        Pricing pricingModel ->
-            viewPageWithNavbar
-                { showHomeButton = True, showHero = Page.NoHero, selectedTab = Page.PricingTab }
-                GotPricingMsg
-                (Pricing.view pricingModel)
 
 
 
@@ -228,8 +202,6 @@ type Msg
     | GotOAuthRedirectMsg OAuthRedirect.Msg
     | GotDocumentationMsg Documentation.Msg
     | GotRepoMsg Repo.Msg
-    | GotAboutUsMsg AboutUs.Msg
-    | GotPricingMsg Pricing.Msg
     | LandingPageScrollDown
     | ToggleVideoOpenModal Bool
 
@@ -256,12 +228,6 @@ toSession { pageModel } =
             session
 
         Repo { session } ->
-            session
-
-        AboutUs { session } ->
-            session
-
-        Pricing { session } ->
             session
 
 
@@ -307,14 +273,6 @@ changeRouteTo maybeRoute model =
         Just (Route.Repo repoId) ->
             Repo.init session repoId
                 |> updatePageModel Repo GotRepoMsg model
-
-        Just Route.AboutUs ->
-            AboutUs.init session
-                |> updatePageModel AboutUs GotAboutUsMsg model
-
-        Just Route.Pricing ->
-            Pricing.init session
-                |> updatePageModel Pricing GotPricingMsg model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -391,12 +349,6 @@ update msg model =
                             { relativeUrl =
                                 Route.Repo repoId |> Route.routeToString
                             }
-
-                    AboutUs _ ->
-                        Cmd.none
-
-                    Pricing _ ->
-                        Cmd.none
                 , Nav.load Github.oAuthSignInLink
                 ]
             )
@@ -507,20 +459,6 @@ update msg model =
             Repo.update pageMsg repoModel
                 |> updatePageModel Repo GotRepoMsg model
 
-        ( GotAboutUsMsg pageMsg, AboutUs aboutUsModel ) ->
-            AboutUs.update pageMsg aboutUsModel
-                |> updatePageModel AboutUs GotAboutUsMsg model
-
-        ( GotAboutUsMsg _, _ ) ->
-            ( model, Cmd.none )
-
-        ( GotPricingMsg pageMsg, Pricing pricingModel ) ->
-            Pricing.update pageMsg pricingModel
-                |> updatePageModel Pricing GotPricingMsg model
-
-        ( GotPricingMsg _, _ ) ->
-            ( model, Cmd.none )
-
         ( GotRepoMsg _, _ ) ->
             ( model, Cmd.none )
 
@@ -573,12 +511,6 @@ subscriptions model =
                 Sub.none
 
             Repo _ ->
-                Sub.none
-
-            AboutUs _ ->
-                Sub.none
-
-            Pricing _ ->
                 Sub.none
         ]
 

@@ -34,8 +34,6 @@ type Route
     | Documentation DocumentationTab
       -- RepoId
     | Repo Int
-    | AboutUs
-    | Pricing
 
 
 type DocumentationTab
@@ -68,8 +66,6 @@ parser =
         , Parser.map (Documentation BlockTagTab) (s "documentation" </> s "tags" </> s "block")
         , Parser.map (Documentation OwnershipGroupsTab) (s "documentation" </> s "ownership-groups")
         , Parser.map Repo (s "repo" </> int)
-        , Parser.map AboutUs (s "about")
-        , Parser.map Pricing (s "pricing")
         ]
 
 
@@ -147,12 +143,6 @@ routeToString page =
 
                 Repo repoId ->
                     [ "repo", String.fromInt repoId ]
-
-                AboutUs ->
-                    [ "about" ]
-
-                Pricing ->
-                    [ "pricing" ]
 
                 -- Certain routes shouldn't be accessed directly
                 _ ->

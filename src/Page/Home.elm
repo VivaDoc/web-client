@@ -10,6 +10,7 @@ import Github
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Language
 import Route
 import Session exposing (Session)
 import Viewer
@@ -21,12 +22,13 @@ import Viewer
 
 type alias Model =
     { session : Session
+    , landingLanguage : Language.Language
     }
 
 
 init : Session -> ( Model, Cmd Msg )
 init session =
-    ( { session = session }, Cmd.none )
+    ( { session = session, landingLanguage = Language.JavaScript }, Cmd.none )
 
 
 
@@ -156,75 +158,81 @@ renderInstalledRepoLink repo =
 renderLandingPage : Html Msg
 renderLandingPage =
     div
-        [ class "columns is-multiline"
-        , style "height" "100vh"
-        , style "padding-top" "30px"
-        ]
-    <|
-        renderLandingPageIconTextCombo
-            { text = "In a single line tell VivaDoc to monitor critical documentation."
-            , image = Asset.vdLandingIcon1
-            }
-            ++ renderLandingPageIconTextCombo
-                { text = "Sit back as VivaDoc vigilantly monitors documentation across code changes."
-                , image = Asset.vdLandingIcon2
-                }
-            ++ renderLandingPageIconTextCombo
-                { text = "Approve or fix outdated documentation when automatically notified by VivaDoc."
-                , image = Asset.vdLandingIcon3
-                }
-            ++ renderLandingButtons
-
-
-type alias RenderLandingPageIconTextComboConfig =
-    { text : String
-    , image : Asset.Image
-    }
-
-
-renderLandingPageIconTextCombo : RenderLandingPageIconTextComboConfig -> List (Html msg)
-renderLandingPageIconTextCombo config =
-    [ div [ class "column is-one-quarter" ] []
-    , div
-        [ class "column is-one-quarter has-text-centered" ]
-        [ img [ Asset.src config.image, style "height" "190px" ] [] ]
-    , div
-        [ class "column is-one-quarter"
-        , style "height" "190px"
-        ]
+        []
         [ div
-            [ class "level level-item has-text-centered-mobile"
-            , style "height" "100%"
-            , style "padding" "10px"
+            [ class "section has-text-centered"
             ]
-            [ text config.text ]
-        ]
-    , div [ class "column is-one-quarter" ] []
-    ]
-
-
-renderLandingButtons : List (Html Msg)
-renderLandingButtons =
-    [ div [ class "column is-one-quarter" ] []
-    , div
-        [ class "column is-half has-text-centered buttons"
-        , style "margin-top" "20px"
-        ]
-        [ a
-            [ class "button is-large is-light"
-            , Route.href <| Route.Documentation Route.OverviewTab
-            , style "min-width" "45%"
+            [ div
+                [ class "title is-2" ]
+                [ text "VivaDoc" ]
+            , div
+                [ class "subtitle is-4" ]
+                [ text "prevent code comments from going out of date by adding checks to your code review pipeline" ]
             ]
-            [ text "Read the docs" ]
-        , button
-            [ class "button is-large is-primary"
-            , onClick SignUpWithGithub
-            , style "min-width" "45%"
+        , div
+            [ class "buttons has-addons is-centered" ]
+            [ button
+                [ class "button" ]
+                [ text "C" ]
+            , button
+                [ class "button" ]
+                [ text "C++" ]
+            , button
+                [ class "button" ]
+                [ text "C#" ]
+            , button
+                [ class "button" ]
+                [ text "Go" ]
+            , button
+                [ class "button" ]
+                [ text "Java" ]
+            , button
+                [ class "button" ]
+                [ text "JavaScript" ]
+            , button
+                [ class "button" ]
+                [ text "TypeScript" ]
             ]
-            [ text "Sign up with GitHub" ]
+        , div
+            [ class "columns is-centered", style "padding" "1.5rem" ]
+            [ div
+                [ class "column is-half-desktop is-two-thirds-tablet has-text-centered" ]
+                [ div
+                    [ class "box" ]
+                    [ div
+                        [ class "title is-5" ]
+                        [ text "Take ownership of a critical comment" ]
+                    ]
+                , div
+                    [ class "box" ]
+                    [ div
+                        [ class "title is-5" ]
+                        [ text "VivaDoc will let you know if that comment needs approval" ]
+                    ]
+                , div
+                    [ class "box" ]
+                    [ div
+                        [ class "title is-5" ]
+                        [ text "Approve the comment " ]
+                    ]
+                , div
+                    [ class "buttons is-centered" ]
+                    [ a
+                        [ class "button is-medium is-dark"
+                        , style "width" "180px"
+                        , Route.href <| Route.Documentation Route.OverviewTab
+                        ]
+                        [ text "Read the docs" ]
+                    , button
+                        [ class "button is-medium is-info"
+                        , style "width" "180px"
+                        , onClick SignUpWithGithub
+                        ]
+                        [ text "Try VivaDoc" ]
+                    ]
+                ]
+            ]
         ]
-    , div [ class "column is-one-quarter" ] []
-    ]
 
 
 
