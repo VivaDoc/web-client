@@ -111,7 +111,7 @@ renderNavbar config maybeViewer =
                                     ]
                                 , onClick config.loginWithGithub
                                 ]
-                                [ text "Try VivaDoc" ]
+                                [ text "Sign in with GitHub" ]
                             ]
 
                         Just viewer ->

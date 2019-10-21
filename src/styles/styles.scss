@@ -9,6 +9,29 @@ $vd-spark-bright: #66FCF1;
 $vd-spark-dark: #45A29E;
 $bg-grey: #FAFCFD;
 
+
+.landing-code-editor {
+  height: 125px;
+
+  pre {
+    min-height: 100%;
+    border: 1px solid lightgrey;
+
+    .green-line {
+      background: #004d00;
+      border-color: #060;
+      position: absolute;
+    }
+
+    .red-line {
+      background: #650000;
+      border-color: #600;
+      position: absolute;
+    }
+
+  }
+}
+
 .has-code-editor {
     overflow: auto;
     height: 500px;
@@ -18,13 +41,13 @@ $bg-grey: #FAFCFD;
       border: 1px solid lightgrey;
 
       .green-line {
-        background: #002800;
+        background: #004d00;
         border-color: #060;
         position: absolute;
       }
 
       .red-line {
-        background: #380000;
+        background: #650000;
         border-color: #600;
         position: absolute;
       }

@@ -6,11 +6,13 @@ module Page.Home exposing (Model, Msg, init, subscriptions, toSession, update, v
 import Api.Core as Core
 import Asset
 import Browser.Navigation as Nav
+import CodeEditor
 import Github
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Language
+import Ports
 import Route
 import Session exposing (Session)
 import Viewer
@@ -28,7 +30,13 @@ type alias Model =
 
 init : Session -> ( Model, Cmd Msg )
 init session =
-    ( { session = session, landingLanguage = Language.JavaScript }, Cmd.none )
+    let
+        initLandingLang =
+            Language.JavaScript
+    in
+    ( { session = session, landingLanguage = initLandingLang }
+    , renderLandingCodeEditor initLandingLang
+    )
 
 
 
@@ -46,7 +54,7 @@ view model =
         Session.Guest _ ->
             { title = "Welcome"
             , content =
-                renderLandingPage
+                renderLandingPage model.landingLanguage
             }
 
 
@@ -155,10 +163,10 @@ renderInstalledRepoLink repo =
         ]
 
 
-renderLandingPage : Html Msg
-renderLandingPage =
+renderLandingPage : Language.Language -> Html Msg
+renderLandingPage selectedLanguage =
     div
-        []
+        [ class "color-bg-grey" ]
         [ div
             [ class "section has-text-centered"
             ]
@@ -167,30 +175,68 @@ renderLandingPage =
                 [ text "VivaDoc" ]
             , div
                 [ class "subtitle is-4" ]
-                [ text "prevent code comments from going out of date by adding checks to your code review pipeline" ]
+                [ text "Prevent code comments from going out of date by adding checks to your code review pipeline" ]
             ]
+        , p
+            [ class "has-text-centered" ]
+            [ text "select your language, more coming soon!" ]
         , div
             [ class "buttons has-addons is-centered" ]
             [ button
-                [ class "button" ]
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.C )
+                    ]
+                , onClick <| SelectLandingLanguage Language.C
+                ]
                 [ text "C" ]
             , button
-                [ class "button" ]
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.CPlusPlus )
+                    ]
+                , onClick <| SelectLandingLanguage Language.CPlusPlus
+                ]
                 [ text "C++" ]
             , button
-                [ class "button" ]
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.CSharp )
+                    ]
+                , onClick <| SelectLandingLanguage Language.CSharp
+                ]
                 [ text "C#" ]
             , button
-                [ class "button" ]
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.Go )
+                    ]
+                , onClick <| SelectLandingLanguage Language.Go
+                ]
                 [ text "Go" ]
             , button
-                [ class "button" ]
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.Java )
+                    ]
+                , onClick <| SelectLandingLanguage Language.Java
+                ]
                 [ text "Java" ]
             , button
-                [ class "button" ]
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.JavaScript )
+                    ]
+                , onClick <| SelectLandingLanguage Language.JavaScript
+                ]
                 [ text "JavaScript" ]
             , button
-                [ class "button" ]
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.TypeScript )
+                    ]
+                , onClick <| SelectLandingLanguage Language.TypeScript
+                ]
                 [ text "TypeScript" ]
             ]
         , div
@@ -201,19 +247,33 @@ renderLandingPage =
                     [ class "box" ]
                     [ div
                         [ class "title is-5" ]
-                        [ text "Take ownership of a critical comment" ]
+                        [ text "Easily assign ownership to a critical comment" ]
+                    , div
+                        [ class "landing-code-editor" ]
+                        [ CodeEditor.codeEditor "landing-editor" ]
                     ]
                 , div
                     [ class "box" ]
                     [ div
                         [ class "title is-5" ]
-                        [ text "VivaDoc will let you know if that comment needs approval" ]
+                        [ text "PRs with changes to this code or comment require approval" ]
+                    , img
+                        [ Asset.src Asset.prFailed
+                        , style "padding-top" "10px"
+                        ]
+                        []
                     ]
                 , div
                     [ class "box" ]
                     [ div
                         [ class "title is-5" ]
-                        [ text "Approve the comment " ]
+                        [ text "The owner quickly verifies if the comment is up-to-date"
+                        , img
+                            [ Asset.src Asset.approveChange
+                            , style "padding-top" "10px"
+                            ]
+                            []
+                        ]
                     ]
                 , div
                     [ class "buttons is-centered" ]
@@ -241,6 +301,7 @@ renderLandingPage =
 
 type Msg
     = SignUpWithGithub
+    | SelectLandingLanguage Language.Language
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -250,6 +311,98 @@ update msg model =
             ( model
             , Nav.load Github.oAuthSignInLink
             )
+
+        SelectLandingLanguage selectedLandingLanguage ->
+            ( { model | landingLanguage = selectedLandingLanguage }
+            , renderLandingCodeEditor selectedLandingLanguage
+            )
+
+
+renderLandingCodeEditor : Language.Language -> Cmd Msg
+renderLandingCodeEditor language =
+    let
+        renderContent content =
+            Ports.renderCodeEditors
+                [ { tagId = "landing-editor"
+                  , startLineNumber = 1
+                  , customLineNumbers = Nothing
+                  , redLineRanges = []
+                  , greenLineRanges = [ ( 2, 2 ), ( 6, 6 ) ]
+                  , content = content
+                  , language = Language.toString language
+                  }
+                ]
+    in
+    case language of
+        Language.C ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD amilner42 start"
+                , "void createProgrammer() {"
+                , """  printf("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.CPlusPlus ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD amilner42 start"
+                , "void createProgrammer() {"
+                , """  cout << "Hello, World";"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.CSharp ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD amilner42 start"
+                , "public static void CreateProgrammer() {"
+                , """  Console.WriteLine("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.Go ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD amilner42 start"
+                , "func createProgrammer() {"
+                , """  fmt.Println("Hello World") """
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.Java ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD amilner42 start"
+                , "public static void createProgrammer() {"
+                , """  System.out.println("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.JavaScript ->
+            renderContent
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD amilner42 start"
+                , "const createProgrammer = () => {"
+                , """  console.log("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.TypeScript ->
+            renderContent
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD amilner42 start"
+                , "const createProgrammer = (): void => {"
+                , """  console.log("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
 
 
 
