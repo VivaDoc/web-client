@@ -166,7 +166,7 @@ renderInstalledRepoLink repo =
 renderLandingPage : Language.Language -> Html Msg
 renderLandingPage selectedLanguage =
     div
-        [ class "color-bg-grey" ]
+        []
         [ div
             [ class "section has-text-centered"
             ]

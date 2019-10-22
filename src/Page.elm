@@ -26,7 +26,7 @@ viewWithHeader renderNavbarConfig maybeViewer { title, content } toMsg =
     { title = title
     , body =
         [ renderNavbar renderNavbarConfig maybeViewer
-        , Html.map toMsg content
+        , Html.map toMsg <| div [ class "color-bg-grey" ] [ content ]
         ]
     }
 

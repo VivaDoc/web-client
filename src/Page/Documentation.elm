@@ -60,7 +60,7 @@ view model =
 renderDocumentation : Model -> Html msg
 renderDocumentation ({ session, documentationTab } as model) =
     div
-        [ class "columns color-bg-grey" ]
+        [ class "columns" ]
         [ div
             [ class "column is-one-quarter-desktop is-one-third-tablet" ]
             [ renderSidebar documentationTab ]
