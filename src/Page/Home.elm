@@ -247,7 +247,7 @@ renderLandingPage selectedLanguage =
                     [ class "box", style "padding" "1.5rem" ]
                     [ div
                         [ class "title is-5" ]
-                        [ text "Tag the VD bot and mention a user to assign them ownership of a critical comment and associated code." ]
+                        [ text "Tag the VivaDoc bot and mention a user to assign them ownership of a critical comment and associated code." ]
                     , div
                         [ class "landing-code-editor" ]
                         [ CodeEditor.codeEditor "landing-editor-1" ]
