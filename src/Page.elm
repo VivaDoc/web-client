@@ -103,16 +103,16 @@ renderNavbar config maybeViewer =
                 [ class "navbar-end" ]
                 [ div
                     [ class "navbar-item" ]
-                    [ case maybeViewer of
-                        Nothing ->
-                            div
-                                [ class "buttons" ]
-                                [ a
-                                    [ class "button is-dark"
-                                    , href "https://github.com/vivadoc"
-                                    ]
-                                    [ text "View code on GitHub" ]
-                                , button
+                    [ div
+                        [ class "buttons" ]
+                        [ a
+                            [ class "button is-dark"
+                            , href "https://github.com/vivadoc"
+                            ]
+                            [ text "View VivaDoc on GitHub" ]
+                        , case maybeViewer of
+                            Nothing ->
+                                button
                                     [ classList
                                         [ ( "button is-info", True )
                                         , ( "is-loading", config.isLoggingIn )
@@ -120,17 +120,17 @@ renderNavbar config maybeViewer =
                                     , onClick config.loginWithGithub
                                     ]
                                     [ text "Sign in with GitHub" ]
-                                ]
 
-                        Just viewer ->
-                            button
-                                [ classList
-                                    [ ( "button is-light", True )
-                                    , ( "is-loading", config.isLoggingOut )
+                            Just viewer ->
+                                button
+                                    [ classList
+                                        [ ( "button is-light", True )
+                                        , ( "is-loading", config.isLoggingOut )
+                                        ]
+                                    , onClick config.logout
                                     ]
-                                , onClick config.logout
-                                ]
-                                [ text "Log out" ]
+                                    [ text "Log out" ]
+                        ]
                     ]
                 ]
             ]

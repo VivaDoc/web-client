@@ -175,7 +175,7 @@ renderLandingPage selectedLanguage =
                 [ text "VivaDoc" ]
             , div
                 [ class "subtitle is-4" ]
-                [ text "Prevent code comments from going out of date by adding checks to your code review pipeline" ]
+                [ text "Prevent code comments from going out of date by adding checks to your GitHub code review pipeline" ]
             ]
         , p
             [ class "has-text-centered" ]
