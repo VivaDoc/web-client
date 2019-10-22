@@ -125,7 +125,7 @@ renderNavbar config maybeViewer =
                         Just viewer ->
                             button
                                 [ classList
-                                    [ ( "button is-light is-medium", True )
+                                    [ ( "button is-light", True )
                                     , ( "is-loading", config.isLoggingOut )
                                     ]
                                 , onClick config.logout
