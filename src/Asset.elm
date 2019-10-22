@@ -1,4 +1,4 @@
-module Asset exposing (Image, approveChange, githubLogo, prFailed, src, vdLogo, vdTitle)
+module Asset exposing (Image, commentReviewStatus, githubLogo, prFailed, src, vdLogo, vdTitle)
 
 {-| Assets, such as images, videos, and audio.
 
@@ -39,9 +39,9 @@ prFailed =
     image "pr-failed.jpg"
 
 
-approveChange : Image
-approveChange =
-    image "vivadoc-approve-change.jpg"
+commentReviewStatus : Image
+commentReviewStatus =
+    image "comment-review-status.jpg"
 
 
 image : String -> Image

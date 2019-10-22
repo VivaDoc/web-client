@@ -175,7 +175,7 @@ renderLandingPage selectedLanguage =
                 [ text "VivaDoc" ]
             , div
                 [ class "subtitle is-4" ]
-                [ text "Prevent code comments from going out of date by adding checks to your GitHub code review pipeline" ]
+                [ text "Stop the most critical code comments from going out of date by adding checks to your GitHub code review pipeline" ]
             ]
         , p
             [ class "has-text-centered" ]
@@ -244,36 +244,40 @@ renderLandingPage selectedLanguage =
             [ div
                 [ class "column is-half-desktop is-two-thirds-tablet has-text-centered" ]
                 [ div
-                    [ class "box" ]
+                    [ class "box", style "padding" "1.5rem" ]
                     [ div
                         [ class "title is-5" ]
-                        [ text "Easily assign ownership to a critical comment" ]
+                        [ text "Tag the VD bot and mention a user to assign them ownership of a critical comment and associated code." ]
                     , div
                         [ class "landing-code-editor" ]
-                        [ CodeEditor.codeEditor "landing-editor" ]
+                        [ CodeEditor.codeEditor "landing-editor-1" ]
                     ]
+                , hr [] []
                 , div
-                    [ class "box" ]
+                    [ class "box", style "padding" "1.5rem" ]
                     [ div
                         [ class "title is-5" ]
-                        [ text "PRs with changes to this code or comment require approval" ]
+                        [ text "PRs with changes to the comment or associated code will have a failing status, requiring approval from the owner." ]
                     , img
                         [ Asset.src Asset.prFailed
                         , style "padding-top" "10px"
                         ]
                         []
                     ]
+                , hr [] []
                 , div
-                    [ class "box" ]
+                    [ class "box", style "padding" "1.5rem" ]
                     [ div
                         [ class "title is-5" ]
-                        [ text "The owner quickly verifies if the comment is up-to-date"
-                        , img
-                            [ Asset.src Asset.approveChange
-                            , style "padding-top" "10px"
-                            ]
-                            []
+                        [ text "From within the VivaDoc webapp, the owner quickly verifies if the comment is up to date." ]
+                    , div
+                        [ class "landing-code-editor" ]
+                        [ CodeEditor.codeEditor "landing-editor-2" ]
+                    , img
+                        [ Asset.src Asset.commentReviewStatus
+                        , style "padding-top" "10px"
                         ]
+                        []
                     ]
                 , div
                     [ class "buttons is-centered" ]
@@ -321,14 +325,22 @@ update msg model =
 renderLandingCodeEditor : Language.Language -> Cmd Msg
 renderLandingCodeEditor language =
     let
-        renderContent content =
+        renderContent content1 content2 =
             Ports.renderCodeEditors
-                [ { tagId = "landing-editor"
+                [ { tagId = "landing-editor-1"
                   , startLineNumber = 1
                   , customLineNumbers = Nothing
                   , redLineRanges = []
                   , greenLineRanges = [ ( 2, 2 ), ( 6, 6 ) ]
-                  , content = content
+                  , content = content1
+                  , language = Language.toString language
+                  }
+                , { tagId = "landing-editor-2"
+                  , startLineNumber = 1
+                  , customLineNumbers = Just [ Just 1, Just 2, Just 3, Nothing, Just 4, Just 5, Just 6 ]
+                  , redLineRanges = [ ( 4, 4 ) ]
+                  , greenLineRanges = [ ( 5, 5 ) ]
+                  , content = content2
                   , language = Language.toString language
                   }
                 ]
@@ -337,9 +349,17 @@ renderLandingCodeEditor language =
         Language.C ->
             renderContent
                 [ "// Prints hello world to STDOUT and thereby creates a new programmer."
-                , "// @VD amilner42 start"
+                , "// @VD john-doe start"
                 , "void createProgrammer() {"
                 , """  printf("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "void createProgrammer() {"
+                , """  printf("Hello World");"""
+                , """  printf("Goodbye World");"""
                 , "}"
                 , "// @VD end"
                 ]
@@ -347,9 +367,17 @@ renderLandingCodeEditor language =
         Language.CPlusPlus ->
             renderContent
                 [ "// Prints hello world to STDOUT and thereby creates a new programmer."
-                , "// @VD amilner42 start"
+                , "// @VD john-doe start"
                 , "void createProgrammer() {"
-                , """  cout << "Hello, World";"""
+                , """  cout << "Hello World";"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "void createProgrammer() {"
+                , """  cout << "Hello World";"""
+                , """  cout << "Goodbye World";"""
                 , "}"
                 , "// @VD end"
                 ]
@@ -357,9 +385,17 @@ renderLandingCodeEditor language =
         Language.CSharp ->
             renderContent
                 [ "// Prints hello world to STDOUT and thereby creates a new programmer."
-                , "// @VD amilner42 start"
+                , "// @VD john-doe start"
                 , "public static void CreateProgrammer() {"
                 , """  Console.WriteLine("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "public static void CreateProgrammer() {"
+                , """  Console.WriteLine("Hello World");"""
+                , """  Console.WriteLine("Goodbye World");"""
                 , "}"
                 , "// @VD end"
                 ]
@@ -367,9 +403,17 @@ renderLandingCodeEditor language =
         Language.Go ->
             renderContent
                 [ "// Prints hello world to STDOUT and thereby creates a new programmer."
-                , "// @VD amilner42 start"
+                , "// @VD john-doe start"
                 , "func createProgrammer() {"
                 , """  fmt.Println("Hello World") """
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "func createProgrammer() {"
+                , """  fmt.Println("Hello World") """
+                , """  fmt.Println("Goodbye World") """
                 , "}"
                 , "// @VD end"
                 ]
@@ -377,9 +421,17 @@ renderLandingCodeEditor language =
         Language.Java ->
             renderContent
                 [ "// Prints hello world to STDOUT and thereby creates a new programmer."
-                , "// @VD amilner42 start"
+                , "// @VD john-doe start"
                 , "public static void createProgrammer() {"
                 , """  System.out.println("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "public static void createProgrammer() {"
+                , """  System.out.println("Hello World");"""
+                , """  System.out.println("Goodbye World");"""
                 , "}"
                 , "// @VD end"
                 ]
@@ -387,9 +439,17 @@ renderLandingCodeEditor language =
         Language.JavaScript ->
             renderContent
                 [ "// Prints hello world to the console and thereby creates a new programmer."
-                , "// @VD amilner42 start"
+                , "// @VD john-doe start"
                 , "const createProgrammer = () => {"
                 , """  console.log("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "const createProgrammer = () => {"
+                , """  console.log("Hello World");"""
+                , """  console.log("Goodbye World");"""
                 , "}"
                 , "// @VD end"
                 ]
@@ -397,9 +457,17 @@ renderLandingCodeEditor language =
         Language.TypeScript ->
             renderContent
                 [ "// Prints hello world to the console and thereby creates a new programmer."
-                , "// @VD amilner42 start"
+                , "// @VD john-doe start"
                 , "const createProgrammer = (): void => {"
                 , """  console.log("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "const createProgrammer = (): void => {"
+                , """  console.log("Hello World");"""
+                , """  console.log("Goodbye World");"""
                 , "}"
                 , "// @VD end"
                 ]
