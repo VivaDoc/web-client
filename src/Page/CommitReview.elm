@@ -611,7 +611,7 @@ renderFileReview config fileReview =
                 CommitReview.NewFileReview tags ->
                     renderTags
                         config.username
-                        "This tag is being added to a new file."
+                        "New comment ownership requires approval."
                         config.isCommitStale
                         fileReview.currentLanguage
                         tags
@@ -619,7 +619,7 @@ renderFileReview config fileReview =
                 CommitReview.DeletedFileReview tags ->
                     renderTags
                         config.username
-                        "This tag is being removed inside a deleted file."
+                        "Removal of comment ownership requires approval."
                         config.isCommitStale
                         fileReview.currentLanguage
                         tags
@@ -719,13 +719,13 @@ renderReviews username isCommitStale language reviews =
                 , description =
                     case review.reviewType of
                         CommitReview.ReviewNewTag _ ->
-                            "This tag is being added to an existing file."
+                            "New comment ownership requires approval."
 
                         CommitReview.ReviewDeletedTag _ ->
-                            "This tag is being deleted from an existing file."
+                            "Removal of comment ownership requires approval."
 
                         CommitReview.ReviewModifiedTag _ ->
-                            "This tag is being modified."
+                            "A modification requires approval."
                 , isCommitStale = isCommitStale
                 , maybeReview = Just review
                 , language = language
@@ -892,11 +892,11 @@ type alias RenderInfoBoxTopBarConfig =
 renderInfoBoxTopBar : RenderInfoBoxTopBarConfig -> Html msg
 renderInfoBoxTopBar config =
     let
-        tagTypeTitle =
+        commentReviewBoxTitle =
             div [ class "level-left" ]
                 [ p
                     [ class "title is-6", style "font-weight" "400" ]
-                    [ text <| CommitReview.readableTagType config.tag.tagType ]
+                    [ text "Comment Review" ]
                 ]
 
         approvalStateTitle =
@@ -930,7 +930,7 @@ renderInfoBoxTopBar config =
                     div [ class "is-hidden" ] []
     in
     div [ class "level is-mobile", style "margin-bottom" "15px" ]
-        [ tagTypeTitle, approvalStateTitle ]
+        [ commentReviewBoxTitle, approvalStateTitle ]
 
 
 renderOwnerGroupsForTag : List OG.OwnerGroup -> List UA.UserAssessment -> List (Html msg)
