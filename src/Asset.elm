@@ -1,4 +1,4 @@
-module Asset exposing (Image, arie, githubLogo, jake, playVid, src, vdLandingIcon1, vdLandingIcon2, vdLandingIcon3, vdLogo, vdTitle)
+module Asset exposing (Image, commentReviewStatus, githubLogo, prFailed, src, vdLogo, vdTitle)
 
 {-| Assets, such as images, videos, and audio.
 
@@ -34,34 +34,14 @@ vdTitle =
     image "vd-title.svg"
 
 
-vdLandingIcon1 : Image
-vdLandingIcon1 =
-    image "vd-landing-icon-1.svg"
+prFailed : Image
+prFailed =
+    image "pr-failed.jpg"
 
 
-vdLandingIcon2 : Image
-vdLandingIcon2 =
-    image "vd-landing-icon-2.svg"
-
-
-vdLandingIcon3 : Image
-vdLandingIcon3 =
-    image "vd-landing-icon-3.svg"
-
-
-playVid : Image
-playVid =
-    image "play-vid.svg"
-
-
-jake : Image
-jake =
-    image "jake.jpg"
-
-
-arie : Image
-arie =
-    image "arie.jpg"
+commentReviewStatus : Image
+commentReviewStatus =
+    image "comment-review-status.jpg"
 
 
 image : String -> Image

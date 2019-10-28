@@ -7,7 +7,30 @@ $vd-base-medium: #1F2833;
 $vd-base-light: #C5C6C7;
 $vd-spark-bright: #66FCF1;
 $vd-spark-dark: #45A29E;
+$bg-grey: #FAFCFD;
 
+
+.landing-code-editor {
+  height: 125px;
+
+  pre {
+    min-height: 100%;
+    border: 1px solid lightgrey;
+
+    .green-line {
+      background: #004d00;
+      border-color: #060;
+      position: absolute;
+    }
+
+    .red-line {
+      background: #650000;
+      border-color: #600;
+      position: absolute;
+    }
+
+  }
+}
 
 .has-code-editor {
     overflow: auto;
@@ -18,13 +41,13 @@ $vd-spark-dark: #45A29E;
       border: 1px solid lightgrey;
 
       .green-line {
-        background: #002800;
+        background: #004d00;
         border-color: #060;
         position: absolute;
       }
 
       .red-line {
-        background: #380000;
+        background: #650000;
         border-color: #600;
         position: absolute;
       }
@@ -116,11 +139,18 @@ iframe {
   }
 }
 
+html, body {
+  background-color: $bg-grey;
+  height: 100%;
+}
+
+.color-bg-grey {
+  background-color: $bg-grey;
+}
+
 /** Bulma CSS and internal CSS requiring Bulma to be loaded. */
 
 // Bulma variables
-$primary: $vd-base-medium;
-$link: $vd-spark-dark;
 $family-primary: 'Roboto', sans-serif;
 $box-radius: 2px;
 $modal-card-head-radius: 2px;
@@ -160,7 +190,7 @@ $tabs-toggle-link-active-color: #666;
 }
 
 .is-border-bottom-underlined {
-  border-bottom: 3px solid $vd-spark-dark;
+  border-bottom: 3px solid blue;
 
   @media only screen and (max-width: $desktop) {
     border-bottom: none;

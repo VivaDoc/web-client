@@ -34,20 +34,13 @@ type Route
     | Documentation DocumentationTab
       -- RepoId
     | Repo Int
-    | AboutUs
-    | Pricing
 
 
 type DocumentationTab
     = InstallationTab
-    | GettingStartedTab
-    | CodeExample
     | SupportedLanguagesTab
     | OverviewTab
     | TagsTab
-    | FileTagTab
-    | LineTagTab
-    | BlockTagTab
     | OwnershipGroupsTab
 
 
@@ -58,18 +51,11 @@ parser =
         , Parser.map OAuthRedirect (s "oauth_redirect" <?> Query.string "code")
         , Parser.map CommitReview (s "review" </> s "repo" </> int </> s "pr" </> int </> s "commit" </> string)
         , Parser.map (Documentation InstallationTab) (s "documentation" </> s "installation")
-        , Parser.map (Documentation GettingStartedTab) (s "documentation" </> s "getting-started")
-        , Parser.map (Documentation CodeExample) (s "documentation" </> s "getting-started" </> s "code-example")
         , Parser.map (Documentation SupportedLanguagesTab) (s "documentation" </> s "supported-languages")
         , Parser.map (Documentation OverviewTab) (s "documentation" </> s "overview")
         , Parser.map (Documentation TagsTab) (s "documentation" </> s "tags")
-        , Parser.map (Documentation FileTagTab) (s "documentation" </> s "tags" </> s "file")
-        , Parser.map (Documentation LineTagTab) (s "documentation" </> s "tags" </> s "line")
-        , Parser.map (Documentation BlockTagTab) (s "documentation" </> s "tags" </> s "block")
         , Parser.map (Documentation OwnershipGroupsTab) (s "documentation" </> s "ownership-groups")
         , Parser.map Repo (s "repo" </> int)
-        , Parser.map AboutUs (s "about")
-        , Parser.map Pricing (s "pricing")
         ]
 
 
@@ -104,12 +90,6 @@ routeToString page =
                 InstallationTab ->
                     [ "installation" ]
 
-                GettingStartedTab ->
-                    [ "getting-started" ]
-
-                CodeExample ->
-                    [ "getting-started", "code-example" ]
-
                 SupportedLanguagesTab ->
                     [ "supported-languages" ]
 
@@ -118,15 +98,6 @@ routeToString page =
 
                 TagsTab ->
                     [ "tags" ]
-
-                FileTagTab ->
-                    [ "tags", "file" ]
-
-                LineTagTab ->
-                    [ "tags", "line" ]
-
-                BlockTagTab ->
-                    [ "tags", "block" ]
 
                 OwnershipGroupsTab ->
                     [ "ownership-groups" ]
@@ -147,12 +118,6 @@ routeToString page =
 
                 Repo repoId ->
                     [ "repo", String.fromInt repoId ]
-
-                AboutUs ->
-                    [ "about" ]
-
-                Pricing ->
-                    [ "pricing" ]
 
                 -- Certain routes shouldn't be accessed directly
                 _ ->

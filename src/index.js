@@ -87,7 +87,7 @@ const renderCodeEditor = (renderConfig) => {
     editors[renderConfig.tagId] = editor;
 
     editor.setReadOnly(true);
-    editor.setTheme("ace/theme/ambiance");
+    editor.setTheme("ace/theme/monokai");
     editor.setPrintMarginColumn(120);
 
     const aceModeName = getAceModeNameFromLanguage(renderConfig.language);

@@ -6,10 +6,13 @@ module Page.Home exposing (Model, Msg, init, subscriptions, toSession, update, v
 import Api.Core as Core
 import Asset
 import Browser.Navigation as Nav
+import CodeEditor
 import Github
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Language
+import Ports
 import Route
 import Session exposing (Session)
 import Viewer
@@ -21,12 +24,19 @@ import Viewer
 
 type alias Model =
     { session : Session
+    , landingLanguage : Language.Language
     }
 
 
 init : Session -> ( Model, Cmd Msg )
 init session =
-    ( { session = session }, Cmd.none )
+    let
+        initLandingLang =
+            Language.JavaScript
+    in
+    ( { session = session, landingLanguage = initLandingLang }
+    , renderLandingCodeEditor initLandingLang
+    )
 
 
 
@@ -44,7 +54,7 @@ view model =
         Session.Guest _ ->
             { title = "Welcome"
             , content =
-                renderLandingPage
+                renderLandingPage model.landingLanguage
             }
 
 
@@ -153,78 +163,140 @@ renderInstalledRepoLink repo =
         ]
 
 
-renderLandingPage : Html Msg
-renderLandingPage =
+renderLandingPage : Language.Language -> Html Msg
+renderLandingPage selectedLanguage =
     div
-        [ class "columns is-multiline"
-        , style "height" "100vh"
-        , style "padding-top" "30px"
-        ]
-    <|
-        renderLandingPageIconTextCombo
-            { text = "In a single line tell VivaDoc to monitor critical documentation."
-            , image = Asset.vdLandingIcon1
-            }
-            ++ renderLandingPageIconTextCombo
-                { text = "Sit back as VivaDoc vigilantly monitors documentation across code changes."
-                , image = Asset.vdLandingIcon2
-                }
-            ++ renderLandingPageIconTextCombo
-                { text = "Approve or fix outdated documentation when automatically notified by VivaDoc."
-                , image = Asset.vdLandingIcon3
-                }
-            ++ renderLandingButtons
-
-
-type alias RenderLandingPageIconTextComboConfig =
-    { text : String
-    , image : Asset.Image
-    }
-
-
-renderLandingPageIconTextCombo : RenderLandingPageIconTextComboConfig -> List (Html msg)
-renderLandingPageIconTextCombo config =
-    [ div [ class "column is-one-quarter" ] []
-    , div
-        [ class "column is-one-quarter has-text-centered" ]
-        [ img [ Asset.src config.image, style "height" "190px" ] [] ]
-    , div
-        [ class "column is-one-quarter"
-        , style "height" "190px"
-        ]
+        []
         [ div
-            [ class "level level-item has-text-centered-mobile"
-            , style "height" "100%"
-            , style "padding" "10px"
+            [ class "section has-text-centered"
             ]
-            [ text config.text ]
-        ]
-    , div [ class "column is-one-quarter" ] []
-    ]
-
-
-renderLandingButtons : List (Html Msg)
-renderLandingButtons =
-    [ div [ class "column is-one-quarter" ] []
-    , div
-        [ class "column is-half has-text-centered buttons"
-        , style "margin-top" "20px"
-        ]
-        [ a
-            [ class "button is-large is-light"
-            , Route.href <| Route.Documentation Route.OverviewTab
-            , style "min-width" "45%"
+            [ div
+                [ class "title is-2" ]
+                [ text "VivaDoc" ]
+            , div
+                [ class "subtitle is-4" ]
+                [ text "Stop the most critical code comments from going out of date by adding checks to your GitHub code review pipeline" ]
             ]
-            [ text "Read the docs" ]
-        , button
-            [ class "button is-large is-primary"
-            , onClick SignUpWithGithub
-            , style "min-width" "45%"
+        , p
+            [ class "has-text-centered" ]
+            [ text "select your language, more coming soon!" ]
+        , div
+            [ class "buttons has-addons is-centered" ]
+            [ button
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.C )
+                    ]
+                , onClick <| SelectLandingLanguage Language.C
+                ]
+                [ text "C" ]
+            , button
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.CPlusPlus )
+                    ]
+                , onClick <| SelectLandingLanguage Language.CPlusPlus
+                ]
+                [ text "C++" ]
+            , button
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.CSharp )
+                    ]
+                , onClick <| SelectLandingLanguage Language.CSharp
+                ]
+                [ text "C#" ]
+            , button
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.Go )
+                    ]
+                , onClick <| SelectLandingLanguage Language.Go
+                ]
+                [ text "Go" ]
+            , button
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.Java )
+                    ]
+                , onClick <| SelectLandingLanguage Language.Java
+                ]
+                [ text "Java" ]
+            , button
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.JavaScript )
+                    ]
+                , onClick <| SelectLandingLanguage Language.JavaScript
+                ]
+                [ text "JavaScript" ]
+            , button
+                [ classList
+                    [ ( "button is-rounded", True )
+                    , ( "is-link", selectedLanguage == Language.TypeScript )
+                    ]
+                , onClick <| SelectLandingLanguage Language.TypeScript
+                ]
+                [ text "TypeScript" ]
             ]
-            [ text "Sign up with GitHub" ]
+        , div
+            [ class "columns is-centered", style "padding" "1.5rem" ]
+            [ div
+                [ class "column is-half-desktop is-two-thirds-tablet has-text-centered" ]
+                [ div
+                    [ class "box", style "padding" "1.5rem" ]
+                    [ div
+                        [ class "title is-5" ]
+                        [ text "Tag the VivaDoc bot and mention a user to assign them ownership of a critical comment and associated code." ]
+                    , div
+                        [ class "landing-code-editor" ]
+                        [ CodeEditor.codeEditor "landing-editor-1" ]
+                    ]
+                , hr [] []
+                , div
+                    [ class "box", style "padding" "1.5rem" ]
+                    [ div
+                        [ class "title is-5" ]
+                        [ text "PRs with changes to the comment or associated code will have a failing status, requiring approval from the owner." ]
+                    , img
+                        [ Asset.src Asset.prFailed
+                        , style "padding-top" "10px"
+                        ]
+                        []
+                    ]
+                , hr [] []
+                , div
+                    [ class "box", style "padding" "1.5rem" ]
+                    [ div
+                        [ class "title is-5" ]
+                        [ text "From within the VivaDoc webapp, the owner quickly verifies if the comment is up to date." ]
+                    , div
+                        [ class "landing-code-editor" ]
+                        [ CodeEditor.codeEditor "landing-editor-2" ]
+                    , img
+                        [ Asset.src Asset.commentReviewStatus
+                        , style "padding-top" "10px"
+                        ]
+                        []
+                    ]
+                , div
+                    [ class "buttons is-centered" ]
+                    [ a
+                        [ class "button is-medium is-dark"
+                        , style "width" "180px"
+                        , Route.href <| Route.Documentation Route.OverviewTab
+                        ]
+                        [ text "Read the docs" ]
+                    , button
+                        [ class "button is-medium is-info"
+                        , style "width" "180px"
+                        , onClick SignUpWithGithub
+                        ]
+                        [ text "Try VivaDoc" ]
+                    ]
+                ]
+            ]
         ]
-    , div [ class "column is-one-quarter" ] []
-    ]
 
 
 
@@ -233,6 +305,7 @@ renderLandingButtons =
 
 type Msg
     = SignUpWithGithub
+    | SelectLandingLanguage Language.Language
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -242,6 +315,162 @@ update msg model =
             ( model
             , Nav.load Github.oAuthSignInLink
             )
+
+        SelectLandingLanguage selectedLandingLanguage ->
+            ( { model | landingLanguage = selectedLandingLanguage }
+            , renderLandingCodeEditor selectedLandingLanguage
+            )
+
+
+renderLandingCodeEditor : Language.Language -> Cmd Msg
+renderLandingCodeEditor language =
+    let
+        renderContent content1 content2 =
+            Ports.renderCodeEditors
+                [ { tagId = "landing-editor-1"
+                  , startLineNumber = 1
+                  , customLineNumbers = Nothing
+                  , redLineRanges = []
+                  , greenLineRanges = [ ( 2, 2 ), ( 6, 6 ) ]
+                  , content = content1
+                  , language = Language.toString language
+                  }
+                , { tagId = "landing-editor-2"
+                  , startLineNumber = 1
+                  , customLineNumbers = Just [ Just 1, Just 2, Just 3, Nothing, Just 4, Just 5, Just 6 ]
+                  , redLineRanges = [ ( 4, 4 ) ]
+                  , greenLineRanges = [ ( 5, 5 ) ]
+                  , content = content2
+                  , language = Language.toString language
+                  }
+                ]
+    in
+    case language of
+        Language.C ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "void createProgrammer() {"
+                , """  printf("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "void createProgrammer() {"
+                , """  printf("Hello World");"""
+                , """  printf("Goodbye World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.CPlusPlus ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "void createProgrammer() {"
+                , """  cout << "Hello World";"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "void createProgrammer() {"
+                , """  cout << "Hello World";"""
+                , """  cout << "Goodbye World";"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.CSharp ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "public static void CreateProgrammer() {"
+                , """  Console.WriteLine("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "public static void CreateProgrammer() {"
+                , """  Console.WriteLine("Hello World");"""
+                , """  Console.WriteLine("Goodbye World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.Go ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "func createProgrammer() {"
+                , """  fmt.Println("Hello World") """
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "func createProgrammer() {"
+                , """  fmt.Println("Hello World") """
+                , """  fmt.Println("Goodbye World") """
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.Java ->
+            renderContent
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "public static void createProgrammer() {"
+                , """  System.out.println("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to STDOUT and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "public static void createProgrammer() {"
+                , """  System.out.println("Hello World");"""
+                , """  System.out.println("Goodbye World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.JavaScript ->
+            renderContent
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "const createProgrammer = () => {"
+                , """  console.log("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "const createProgrammer = () => {"
+                , """  console.log("Hello World");"""
+                , """  console.log("Goodbye World");"""
+                , "}"
+                , "// @VD end"
+                ]
+
+        Language.TypeScript ->
+            renderContent
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "const createProgrammer = (): void => {"
+                , """  console.log("Hello World");"""
+                , "}"
+                , "// @VD end"
+                ]
+                [ "// Prints hello world to the console and thereby creates a new programmer."
+                , "// @VD john-doe start"
+                , "const createProgrammer = (): void => {"
+                , """  console.log("Hello World");"""
+                , """  console.log("Goodbye World");"""
+                , "}"
+                , "// @VD end"
+                ]
 
 
 

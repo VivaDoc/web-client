@@ -1,4 +1,4 @@
-module CommitReview exposing (AlteredLine, ApprovedState(..), AuthorFilter(..), CommitReview, DocReviewTagIds, EditType(..), FileReview, FileReviewType(..), Review, ReviewOrTag(..), ReviewStateFilter(..), ReviewType(..), Status(..), Tag, countVisibleReviewsAndTags, decodeCommitReview, docReviewTagIdsToTagAndApprovalState, extractRenderEditorConfigs, getTagCountBreakdownForFiles, getTagIdsInDocReview, hasTagsInDocReview, markedForApprovalCount, markedForRejectionCount, readableTagType, renderConfigForReviewOrTag, updateApprovalStatesForTags, updateCommitReviewForFilters, updateReviews, updateTag, updateTagApprovalState, updateTags)
+module CommitReview exposing (AlteredLine, ApprovedState(..), AuthorFilter(..), CommitReview, DocReviewTagIds, EditType(..), FileReview, FileReviewType(..), Review, ReviewOrTag(..), ReviewStateFilter(..), ReviewType(..), Status(..), Tag, countVisibleReviewsAndTags, decodeCommitReview, docReviewTagIdsToTagAndApprovalState, extractRenderEditorConfigs, getTagCountBreakdownForFiles, getTagIdsInDocReview, hasTagsInDocReview, markedForApprovalCount, markedForRejectionCount, renderConfigForReviewOrTag, updateApprovalStatesForTags, updateCommitReviewForFilters, updateReviews, updateTag, updateTagApprovalState, updateTags)
 
 import Api.Responses.PostUserAssessments as PuaResponse
 import Dict
@@ -75,8 +75,7 @@ type EditType
 
 
 type alias Tag =
-    { tagType : TagType
-    , ownerGroups : List OG.OwnerGroup
+    { ownerGroups : List OG.OwnerGroup
     , startLine : Int
     , endLine : Int
     , tagAnnotationLine : Int
@@ -96,12 +95,6 @@ type ApprovedState err
     | InDocReview UA.AssessmentType
     | InDocReviewBeingSubmitted UA.AssessmentType
     | RequestFailed err
-
-
-type TagType
-    = FileTag
-    | BlockTag
-    | LineTag
 
 
 type Status
@@ -353,19 +346,6 @@ countVisibleTags =
 countVisibleReviews : List Review -> Int
 countVisibleReviews =
     List.map .tag >> countVisibleTags
-
-
-readableTagType : TagType -> String
-readableTagType tagType =
-    case tagType of
-        FileTag ->
-            "File Tag"
-
-        LineTag ->
-            "Line Tag"
-
-        BlockTag ->
-            "Block Tag"
 
 
 type alias TagAndApprovalState =
@@ -1051,24 +1031,6 @@ decodeTag { approvedTags, rejectedTags, userAssessments } =
         |> Decode.andThen
             (\tagId ->
                 Decode.succeed Tag
-                    |> required "tagType"
-                        (Decode.string
-                            |> Decode.andThen
-                                (\tagType ->
-                                    case tagType of
-                                        "file" ->
-                                            Decode.succeed FileTag
-
-                                        "block" ->
-                                            Decode.succeed BlockTag
-
-                                        "line" ->
-                                            Decode.succeed LineTag
-
-                                        _ ->
-                                            Decode.fail <| "Invalid tag type " ++ tagType
-                                )
-                        )
                     |> required "ownerGroups" (Decode.list (Decode.list Decode.string))
                     |> required "startLine" Decode.int
                     |> required "endLine" Decode.int
